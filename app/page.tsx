@@ -2,9 +2,20 @@ import Image from "next/image";
 import { CarCard, CustomFilter, Hero, SearchBar } from "@/components";
 import { fuels, yearsOfProduction } from "@/constants";
 import { fetchCars } from "@/utils";
+import ShowMore from "@/components/ShowMore";
 
-export default async function Home() {
-  const allCars = await fetchCars();
+interface HomeProps {
+  searchParams: Record<string, string | string[] | undefined>;
+}
+
+export default async function Home({ searchParams }: HomeProps) {
+  const allCars = await fetchCars({
+    manufacturer: (searchParams.manufacturer as string) || '', 
+    year: Number(searchParams.year) || 2022, 
+    fuel: (searchParams.fuel as string) || '', 
+    limit: Number(searchParams.limit) || 10, 
+    model: (searchParams.model as string) || '', 
+  });
   
   const isDataEmpty = !Array.isArray(allCars) || allCars.length < 1 || !allCars;
   
@@ -24,8 +35,8 @@ export default async function Home() {
           <SearchBar />
 
           <div className="home__filter-container">
-            <CustomFilter title="fuel"/>
-            <CustomFilter title="year"/>
+            <CustomFilter title="fuel" options={fuels} />
+            <CustomFilter title="year" options={yearsOfProduction}/>
           </div>
         </div>
       </div>
@@ -34,14 +45,19 @@ export default async function Home() {
         <section>
           <div className="home_cars-wrapper">
             {allCars?.map((car, index) => (
-            <CarCard key={car.id ?? index} car={car} />
+              <CarCard key={car.id ?? index} car={car} />
             ))}
-
           </div>
+
+          <ShowMore
+            pageNumber={(Number(searchParams.limit) || 10) / 10}
+            isNext={(Number(searchParams.limit) || 10) > allCars.length}
+          />
+
         </section>
       ) : (
         <div className="home__error-container"> 
-          <h2 className="text-black text-xl font-bold">Oops, no resulrs</h2>
+          <h2 className="text-black text-xl font-bold">Oops, no results</h2>
           <p>{allCars?.message}</p>
         </div>
       )}

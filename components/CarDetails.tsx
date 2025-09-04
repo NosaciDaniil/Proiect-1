@@ -4,17 +4,18 @@ import { CarProps } from "@/types";
 import React, { Fragment } from "react";
 import Image from "next/image";
 import { Dialog, Transition } from "@headlessui/react";
+import { generateCarImageUrl } from "@/utils";
 
 interface CarDetailsProps {
   isOpen: boolean;
-  closeModel: () => void;
+  closeModal: () => void;
   car: CarProps;
 }
 
-const CarDetails = ({ isOpen, closeModel, car }: CarDetailsProps) => {
+const CarDetails = ({ isOpen, closeModal, car }: CarDetailsProps) => {
   return (
-    <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={closeModel}>
+    <Transition appear show={!!isOpen} as={Fragment}>
+      <Dialog as="div" className="relative z-10" onClose={closeModal}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -34,15 +35,16 @@ const CarDetails = ({ isOpen, closeModel, car }: CarDetailsProps) => {
               enter="ease-out duration-300"
               enterFrom="opacity-0 scale-95"
               enterTo="opacity-100 scale-100"
-              leave="ease-in duration-200"
+              leave="ease-out duration-300"
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto transform rounded-2xl bg-white p-6 text-left shadow-xl transition-all flex flex-col gap-5">
+                
                 <button
                   type="button"
                   className="absolute top-2 right-2 z-10 w-fit p-2 bg-primary-blue-100 rounded-full"
-                  onClick={closeModel}
+                  onClick={closeModal}
                 >
                   <Image
                     src="/close.svg"
@@ -56,7 +58,7 @@ const CarDetails = ({ isOpen, closeModel, car }: CarDetailsProps) => {
                 <div className="flex-1 flex flex-col gap-3">
                   <div className="relative w-full h-40 bg-pattern bg-cover bg-center rounded-lg">
                     <Image
-                      src="/hero.png"
+                      src={generateCarImageUrl(car)}
                       alt="car model"
                       fill
                       priority
@@ -65,13 +67,13 @@ const CarDetails = ({ isOpen, closeModel, car }: CarDetailsProps) => {
                   </div>
 
                   <div className="flex gap-3">
-                    {[1, 2, 3].map((i) => (
+                    {["29", "33", "13"].map((angle) => (
                       <div
-                        key={i}
+                        key={angle}
                         className="flex-1 relative w-full h-24 bg-primary-blue-100 rounded-lg"
                       >
                         <Image
-                          src="/hero.png"
+                          src={generateCarImageUrl(car, angle)}
                           alt="car model"
                           fill
                           priority
@@ -90,7 +92,7 @@ const CarDetails = ({ isOpen, closeModel, car }: CarDetailsProps) => {
                   <div className="mt-3 flex flex-wrap gap-4">
                     {Object.entries(car).map(([key, value]) => (
                       <div
-                        className="flex justify-between gap-5 w-full"
+                        className="flex justify-between gap-5 w-full text-right"
                         key={key}
                       >
                         <h4 className="text-grey capitalize">
@@ -101,6 +103,7 @@ const CarDetails = ({ isOpen, closeModel, car }: CarDetailsProps) => {
                     ))}
                   </div>
                 </div>
+                
               </Dialog.Panel>
             </Transition.Child>
           </div>
