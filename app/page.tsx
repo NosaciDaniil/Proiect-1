@@ -1,8 +1,15 @@
 import Image from "next/image";   
-import { CustomFilter, Hero, SearchBar } from "@/components";
+import { CarCard, CustomFilter, Hero, SearchBar } from "@/components";
 import { fuels, yearsOfProduction } from "@/constants";
+import { fetchCars } from "@/utils";
 
-export default function Home() {
+export default async function Home() {
+  const allCars = await fetchCars();
+  
+  const isDataEmpty = !Array.isArray(allCars) || allCars.length < 1 || !allCars;
+  
+  console.log(allCars);
+
   return (
     <main className="overflow-hidden">
       <Hero />
@@ -17,11 +24,27 @@ export default function Home() {
           <SearchBar />
 
           <div className="home__filter-container">
-            <CustomFilter title="fuel" options={fuels} />
-            <CustomFilter title="year" options={yearsOfProduction} />
+            <CustomFilter title="fuel"/>
+            <CustomFilter title="year"/>
           </div>
         </div>
       </div>
+
+      {!isDataEmpty ? (
+        <section>
+          <div className="home_cars-wrapper">
+            {allCars?.map((car, index) => (
+            <CarCard key={car.id ?? index} car={car} />
+            ))}
+
+          </div>
+        </section>
+      ) : (
+        <div className="home__error-container"> 
+          <h2 className="text-black text-xl font-bold">Oops, no resulrs</h2>
+          <p>{allCars?.message}</p>
+        </div>
+      )}
     </main>
   );
 }
